@@ -1,0 +1,117 @@
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GDSC-Stock Prediction</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<body>
+    <div class="container pt-4 mb-3 main-content">
+        <div class="row">
+            <div class="col">
+                <h1> 
+                    <i class="bi bi-tag">
+                        Stock Price Prediction
+                    </i> 
+                </h1>
+            </div>
+        </div>
+        <p>Hello, this is demo website and data visualation for stock price prediction. The model receives the number of
+            days on feature to predict the price on these days.</p>
+
+        <div class="container p-3 border border-2 rounded rounded-2">
+            <form id="prediction">
+                <p>Hãy nhập số ngày bạn muốn dự đoán</p>
+                <div>
+                    <label for="n_days" class="form-label"><strong>Số ngày: </strong></label>
+                    <input type="number" class="form-control" id="n_days" placeholder="Enter days" name="days" />
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">
+                    <i class="bi bi-send-fill" style="font-size: medium;"></i>
+                    Send
+                </button>
+            </form>
+
+            <div class="mt-3">
+                <h3 class="strong">Giá dự đoán: </h3>
+                <br />
+                <table class="table align-items-center mb-0 table-striped" id="data-table">
+                    <thead>
+                        <tr>
+                            <th class="w-25">Ngày</th>
+                            <th class="text-center">Giá</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Data will be inserted here dynamically -->
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <footer class="text-center bg-body-tertiary">
+        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+            GDSC UIT-VNUHCM - Trần Thanh Nhân
+        </div>
+    </footer>
+
+
+    <script>
+        async function getData() {
+            function isLegit(n_days) {
+                return !isNaN(n_days) && n_days >= 2 && n_days <= 30;
+            }
+            const form = document.getElementById('prediction');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const n_days = document.getElementById('n_days').value;
+
+                if (!isLegit(n_days)) {
+                    alert('Số ngày không hợp lệ');
+                    return;
+                }
+                try {
+                    const respone = await fetch(`https://stock-prediction-477950555403.us-central1.run.app/predict/${n_days}`, {
+                        method: 'POST',
+                        headers: {
+                            'accept': 'application/json',
+                        },
+                        body: JSON.stringify({})
+                    });
+
+                    const Data = await respone.json();
+                    const priceData = Data.predict_value;
+
+                    const table = document.querySelector('#data-table tbody');
+                    table.innerHTML = '';
+
+                    priceData.forEach((price, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${index + 1}</td> 
+                            <td class="text-center">${price}</td>
+                            <td></td>
+                        `;
+                        table.appendChild(row);
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        window.onload = getData;
+    </script>
+
+</body>
+</html>

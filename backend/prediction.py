@@ -4,7 +4,7 @@ from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler(feature_range=(0, 1))
 time_steps = 20
 close_stock = np.load('Data/close_stock.npy')
-close_stock = scaler.fit_transform(close_stock.reshape(-1, 1))
+close_stock = scaler.fit_transform(X=close_stock)
 
 def predict(model, n_days : int) :
     x_input = close_stock[-time_steps:].reshape(1,-1) #1 row, many cols

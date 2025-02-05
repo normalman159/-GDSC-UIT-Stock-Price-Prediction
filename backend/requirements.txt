@@ -1,7 +1,7 @@
 fastapi
 uvicorn
-tensorflow
+tensorflow-cpu
 pyyaml
-h5py
 pandas
 scikit-learn
+python-dotenv
