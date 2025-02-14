@@ -1,0 +1,21 @@
+name: Deploy HTML Website to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        BASE_BRANCH: main
+        BRANCH: github-page
+        FOLDER: frontend
