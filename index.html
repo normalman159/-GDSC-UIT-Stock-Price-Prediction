@@ -10,108 +10,157 @@
 </head>
 
 <body>
-    <div class="container pt-4 mb-3 main-content">
-        <div class="row">
-            <div class="col">
-                <h1> 
-                    <i class="bi bi-tag">
-                        Stock Price Prediction
-                    </i> 
-                </h1>
-            </div>
-        </div>
+    <div class="container pt-4 mb-3 main-content flex-column d-flex gap-3">
+        <h1>
+            <i class="bi bi-tag">
+                Stock Price Prediction
+            </i>
+        </h1>
         <p>Hello, this is demo website and data visualation for stock price prediction. The model receives the number of
             days on feature to predict the price on these days.</p>
 
-        <div class="container p-3 border border-2 rounded rounded-2">
+        <div class="container p-3 border border-2 rounded rounded-2" id="prediction-form">
             <form id="prediction">
-                <p>Hãy nhập số ngày bạn muốn dự đoán</p>
+                <p>Let's enter the number of days you want to predict.</p>
                 <div>
-                    <label for="n_days" class="form-label"><strong>Số ngày: </strong></label>
+                    <label for="n_days" class="form-label"><strong>Number of days: </strong></label>
                     <input type="number" class="form-control" id="n_days" placeholder="Enter days" name="days" />
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">
+                <button type="submit" class="btn btn-primary mt-3 ">
                     <i class="bi bi-send-fill" style="font-size: medium;"></i>
-                    Send
+                    Submit
                 </button>
             </form>
 
-            <div class="mt-3">
-                <h3 class="strong">Giá dự đoán: </h3>
-                <br />
+            <div class="mt-3 d-none" id="result">
+                <h3 class="strong">Predicted Result: </h3>
                 <table class="table align-items-center mb-0 table-striped" id="data-table">
                     <thead>
                         <tr>
-                            <th class="w-25">Ngày</th>
-                            <th class="text-center">Giá</th>
+                            <th class="w-25">Days</th>
+                            <th class="text-center">Price</th>
                         </tr>
                     </thead>
                     <tbody>
                         <!-- Data will be inserted here dynamically -->
                     </tbody>
                 </table>
+            </div>
+        </div>
 
+        <div class="d-flex flex-column align-items-start gap-2">
+            <h2>Project Info</h2>
+            <p class="mb-0"> Here is some breakdowns about this projet</p>
+
+            <div class="d-flex flex-column px-2" id="dataset-info">
+                <div class="fs-3">
+                    <div class="bi bi-database-fill">
+                        Dataset
+                    </div>
+                </div>
+
+                <ul class="mb-0">
+                    <li>The dataset used in this project is the stock price of VIC over 3 years.</li>
+                    <li>This dataset consists of over 548 daily price examples.</li>
+                    <li>In pre-training, I have scaled these data to range [0,1] to prevent the model from bias caused by over-high or over-low samples. In the pre-training process, I have scaled these data to range [0,1] to prevent the model from bias caused by the over-high or over-low samples.</li>
+                </ul>
+            </div>
+
+            <div class="d-flex flex-column px-2" id="model-info">
+                <div class="fs-3">
+                    <div class="bi bi-database-fill">
+                        Model
+                    </div>
+                </div>
+
+                <ul class="mb-0">
+                    <li>The technique used is LSTM.</li>
+                    <li>The model consists of many neuron layers that receive the number of days (n_days) as input and process the price in the next n_days.</li>
+                    <!-- <li>The model is trained from </li> -->
+                </ul>
+            </div>
+
+            <div class="d-flex flex-column px-2" id="testing-info">
+                <div class="fs-3">
+                    <div class="bi bi-database-fill">
+                        Testing & Evaluating
+                    </div>
+                </div>
+
+                <ul class="mb-0">
+                    <li></li>
+                </ul>
+            </div>
+
+            <div class="fs-6" id="last-update">
+                <i class="bi bi-calendar-day">
+                    Updated on 14/01/2025
+                </i>
+            </div>
+
+            <div class="d-flex flex-column" id="author-info">
+                <div class="fs-4" id="author">
+                    <div class="bi bi-info-square">
+                        Author & Contact
+                    </div>
+                </div>
+                <p>
+                    This projet is conducted by <strong>Trần Phước Thanh Nhân</strong> from the University of
+                    Information and Technology, VNU-HCM. <br> For more informations, please contact me via email: nhantt.work@gmail.com
+                </p>
             </div>
 
         </div>
 
-    </div>
-
-    <footer class="text-center bg-body-tertiary">
-        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-            GDSC UIT-VNUHCM - Trần Thanh Nhân
-        </div>
-    </footer>
-
-
-    <script>
-        async function getData() {
-            function isLegit(n_days) {
-                return !isNaN(n_days) && n_days >= 2 && n_days <= 30;
-            }
-            const form = document.getElementById('prediction');
-
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                const n_days = document.getElementById('n_days').value;
-
-                if (!isLegit(n_days)) {
-                    alert('Số ngày không hợp lệ');
-                    return;
+        <script>
+            async function getData() {
+                function isLegit(n_days) {
+                    return !isNaN(n_days) && n_days >= 2 && n_days <= 30;
                 }
-                try {
-                    const respone = await fetch(`https://stock-prediction-477950555403.us-central1.run.app/predict/${n_days}`, {
-                        method: 'POST',
-                        headers: {
-                            'accept': 'application/json',
-                        },
-                        body: JSON.stringify({})
-                    });
+                const form = document.getElementById('prediction');
 
-                    const Data = await respone.json();
-                    const priceData = Data.predict_value;
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
 
-                    const table = document.querySelector('#data-table tbody');
-                    table.innerHTML = '';
+                    const n_days = document.getElementById('n_days').value;
 
-                    priceData.forEach((price, index) => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
+                    if (!isLegit(n_days)) {
+                        alert('Số ngày không hợp lệ');
+                        return;
+                    }
+                    try {
+                        const respone = await fetch(`https://stock-prediction-477950555403.us-central1.run.app/predict/${n_days}`, {
+                            method: 'POST',
+                            headers: {
+                                'accept': 'application/json',
+                            },
+                            body: JSON.stringify({})
+                        });
+
+                        const Data = await respone.json();
+                        const priceData = Data.predict_value;
+
+                        const table = document.querySelector('#data-table tbody');
+                        table.innerHTML = '';
+                        document.getElementById('result').classList.remove('d-none');
+
+                        priceData.forEach((price, index) => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
                             <td>${index + 1}</td> 
                             <td class="text-center">${price}</td>
                             <td></td>
                         `;
-                        table.appendChild(row);
-                    });
-                } catch (error) {
-                    console.error(error);
-                }
-            });
-        }
+                            table.appendChild(row);
+                        });
+                    } catch (error) {
 
-        window.onload = getData;
-    </script>
+                    }
+                });
+            }
 
+            window.onload = getData;
+        </script>
 </body>
+
 </html>
